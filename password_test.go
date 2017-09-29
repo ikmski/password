@@ -4,40 +4,33 @@ import "testing"
 
 func TestPasswordVerify(t *testing.T) {
 
-	pp := NewPasswordPolicy()
+	pp := &PasswordPolicy{8, 0, 0}
 
-	pp.Length = 8
-	pp.Digits = 0
-	pp.Symbols = 0
-	ok := pp.Verify("abcd")
+	ok, _ := pp.Verify("abcd")
 	if ok {
 		t.Errorf("got %v\nwant %v", ok, false)
 	}
-	ok = pp.Verify("abcdEFGH")
+	ok, _ = pp.Verify("abcdEFGH")
 	if !ok {
 		t.Errorf("got %v\nwant %v", ok, true)
 	}
 
-	pp.Length = 8
-	pp.Digits = 2
-	pp.Symbols = 0
-	ok = pp.Verify("abcdEFGH")
+	pp = &PasswordPolicy{8, 2, 0}
+	ok, _ = pp.Verify("abcdEFGH")
 	if ok {
 		t.Errorf("got %v\nwant %v", ok, false)
 	}
-	ok = pp.Verify("abcdEF12")
+	ok, _ = pp.Verify("abcdEF12")
 	if !ok {
 		t.Errorf("got %v\nwant %v", ok, true)
 	}
 
-	pp.Length = 8
-	pp.Digits = 0
-	pp.Symbols = 2
-	ok = pp.Verify("abcdEFGH")
+	pp = &PasswordPolicy{8, 0, 2}
+	ok, _ = pp.Verify("abcdEFGH")
 	if ok {
 		t.Errorf("got %v\nwant %v", ok, false)
 	}
-	ok = pp.Verify("@#$%^&*()-_=+,.?/:;{}[]~")
+	ok, _ = pp.Verify("@#$%^&*()-_=+,.?/:;{}[]~")
 	if !ok {
 		t.Errorf("got %v\nwant %v", ok, true)
 	}
@@ -46,20 +39,16 @@ func TestPasswordVerify(t *testing.T) {
 
 func TestPasswordLength(t *testing.T) {
 
-	pp := NewPasswordPolicy()
-
-	pp.Length = 8
-	pp.Digits = 0
-	pp.Symbols = 0
-	ok := pp.HasEnoughLength("abcd")
+	pp := &PasswordPolicy{8, 0, 0}
+	ok, _ := pp.hasEnoughLength("abcd")
 	if ok {
 		t.Errorf("got %v\nwant %v", ok, false)
 	}
-	ok = pp.HasEnoughLength("abcdEFGH")
+	ok, _ = pp.hasEnoughLength("abcdEFGH")
 	if !ok {
 		t.Errorf("got %v\nwant %v", ok, true)
 	}
-	ok = pp.HasEnoughLength("abcdEFGHij")
+	ok, _ = pp.hasEnoughLength("abcdEFGHij")
 	if !ok {
 		t.Errorf("got %v\nwant %v", ok, true)
 	}
@@ -68,20 +57,16 @@ func TestPasswordLength(t *testing.T) {
 
 func TestPasswordDigit(t *testing.T) {
 
-	pp := NewPasswordPolicy()
-
-	pp.Length = 8
-	pp.Digits = 2
-	pp.Symbols = 0
-	ok := pp.HasEnoughDigits("abcd")
+	pp := &PasswordPolicy{8, 2, 0}
+	ok, _ := pp.hasEnoughDigits("abcd")
 	if ok {
 		t.Errorf("got %v\nwant %v", ok, false)
 	}
-	ok = pp.HasEnoughDigits("abcdEF12")
+	ok, _ = pp.hasEnoughDigits("abcdEF12")
 	if !ok {
 		t.Errorf("got %v\nwant %v", ok, true)
 	}
-	ok = pp.HasEnoughDigits("abcdEF1234")
+	ok, _ = pp.hasEnoughDigits("abcdEF1234")
 	if !ok {
 		t.Errorf("got %v\nwant %v", ok, true)
 	}
@@ -90,20 +75,16 @@ func TestPasswordDigit(t *testing.T) {
 
 func TestPasswordSymbol(t *testing.T) {
 
-	pp := NewPasswordPolicy()
-
-	pp.Length = 8
-	pp.Digits = 0
-	pp.Symbols = 2
-	ok := pp.HasEnoughSymbols("abcd")
+	pp := &PasswordPolicy{8, 0, 2}
+	ok, _ := pp.hasEnoughSymbols("abcd")
 	if ok {
 		t.Errorf("got %v\nwant %v", ok, false)
 	}
-	ok = pp.HasEnoughSymbols("abcdEF!@")
+	ok, _ = pp.hasEnoughSymbols("abcdEF!@")
 	if !ok {
 		t.Errorf("got %v\nwant %v", ok, true)
 	}
-	ok = pp.HasEnoughSymbols("abcdEF&*()")
+	ok, _ = pp.hasEnoughSymbols("abcdEF&*()")
 	if !ok {
 		t.Errorf("got %v\nwant %v", ok, true)
 	}

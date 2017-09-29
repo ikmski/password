@@ -1,6 +1,7 @@
 package password
 
 import (
+	"fmt"
 	"math/rand"
 	"regexp"
 	"time"
@@ -19,11 +20,11 @@ type PasswordPolicy struct {
 	Symbols int
 }
 
-func NewPasswordPolicy() *PasswordPolicy {
+func Default() *PasswordPolicy {
 	pp := new(PasswordPolicy)
-	pp.Length = 8
+	pp.Length = 12
 	pp.Digits = 2
-	pp.Symbols = 0
+	pp.Symbols = 2
 	return pp
 }
 
@@ -58,42 +59,60 @@ func shuffle(data []rune) {
 	}
 }
 
-func (pp *PasswordPolicy) Verify(pass string) bool {
+func (pp *PasswordPolicy) Verify(pass string) (bool, []string) {
 
-	if pp.HasEnoughLength(pass) &&
-		pp.HasEnoughDigits(pass) &&
-		pp.HasEnoughSymbols(pass) {
-		return true
+	var result = true
+	var messages = make([]string, 0)
+
+	ok, message := pp.hasEnoughLength(pass)
+	if !ok {
+		result = false
+		messages = append(messages, message)
 	}
 
-	return false
+	ok, message = pp.hasEnoughDigits(pass)
+	if !ok {
+		result = false
+		messages = append(messages, message)
+	}
+
+	ok, message = pp.hasEnoughSymbols(pass)
+	if !ok {
+		result = false
+		messages = append(messages, message)
+	}
+
+	return result, messages
 }
 
-func (pp *PasswordPolicy) HasEnoughLength(pass string) bool {
+func (pp *PasswordPolicy) hasEnoughLength(pass string) (bool, string) {
 
 	if len(pass) >= pp.Length {
-		return true
+		return true, ""
 	}
 
-	return false
+	message := fmt.Sprintf("Your password does not have enough length.\nIt needs %d or more.", pp.Length)
+	return false, message
 }
 
-func (pp *PasswordPolicy) HasEnoughDigits(pass string) bool {
+func (pp *PasswordPolicy) hasEnoughDigits(pass string) (bool, string) {
 
 	s := matchDigits.FindAllString(pass, -1)
 	if len(s) >= pp.Digits {
-		return true
+		return true, ""
 	}
 
-	return false
+	message := fmt.Sprintf("Your password does not have enough digits.\nIt needs %d or more.", pp.Digits)
+	return false, message
 }
 
-func (pp *PasswordPolicy) HasEnoughSymbols(pass string) bool {
+func (pp *PasswordPolicy) hasEnoughSymbols(pass string) (bool, string) {
 
 	s := matchSymbols.FindAllString(pass, -1)
 	if len(s) >= pp.Symbols {
-		return true
+		return true, ""
 	}
 
-	return false
+	message := fmt.Sprintf("Your password does not have enough symbols.\nIt needs %d or more.", pp.Digits)
+	return false, message
 }
