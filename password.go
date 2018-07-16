@@ -14,21 +14,21 @@ var cnstSymbols = []rune("!@#$%^&*()-_=+,.?/:;{}[]~")
 var matchDigits = regexp.MustCompile(`[0-9]`)
 var matchSymbols = regexp.MustCompile(`[\!\@\#\$\%\^\&\*\(\\\)\-_\=\+\,\.\?\/\:\;\{\}\[\]~]`)
 
-type PasswordPolicy struct {
+type Policy struct {
 	Length  int
 	Digits  int
 	Symbols int
 }
 
-func Default() *PasswordPolicy {
-	pp := new(PasswordPolicy)
+func Default() *Policy {
+	pp := new(Policy)
 	pp.Length = 12
 	pp.Digits = 2
 	pp.Symbols = 2
 	return pp
 }
 
-func (pp *PasswordPolicy) Random() string {
+func (pp *Policy) Random() string {
 
 	rand.Seed(time.Now().UTC().UnixNano())
 
@@ -59,7 +59,7 @@ func shuffle(data []rune) {
 	}
 }
 
-func (pp *PasswordPolicy) Verify(pass string) (bool, []string) {
+func (pp *Policy) Verify(pass string) (bool, []string) {
 
 	var result = true
 	var messages = make([]string, 0)
@@ -85,7 +85,7 @@ func (pp *PasswordPolicy) Verify(pass string) (bool, []string) {
 	return result, messages
 }
 
-func (pp *PasswordPolicy) hasEnoughLength(pass string) (bool, string) {
+func (pp *Policy) hasEnoughLength(pass string) (bool, string) {
 
 	if len(pass) >= pp.Length {
 		return true, ""
@@ -95,7 +95,7 @@ func (pp *PasswordPolicy) hasEnoughLength(pass string) (bool, string) {
 	return false, message
 }
 
-func (pp *PasswordPolicy) hasEnoughDigits(pass string) (bool, string) {
+func (pp *Policy) hasEnoughDigits(pass string) (bool, string) {
 
 	s := matchDigits.FindAllString(pass, -1)
 	if len(s) >= pp.Digits {
@@ -106,7 +106,7 @@ func (pp *PasswordPolicy) hasEnoughDigits(pass string) (bool, string) {
 	return false, message
 }
 
-func (pp *PasswordPolicy) hasEnoughSymbols(pass string) (bool, string) {
+func (pp *Policy) hasEnoughSymbols(pass string) (bool, string) {
 
 	s := matchSymbols.FindAllString(pass, -1)
 	if len(s) >= pp.Symbols {

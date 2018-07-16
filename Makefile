@@ -1,11 +1,13 @@
 # meta
 NAME := password
-VERSION := v1.0.0
+VERSION := 0.1.0
 REVISION := $(shell git rev-parse --short HEAD)
 
-GOFILES := $(shell find . -name "*.go" -type f -not -name '*_test.go' -not -path "./vendor/*")
-SOURCES := $(shell find . -name "*.go" -type f)
+PKG := github.com/ikmski/password
 
+SOURCES := $(shell find . -type f -name "*.go")
+CMDSRCS := $(shell find ./cmd -type f -name "*.go")
+GOFILES := $(shell find . -type f -name "*.go" -not -path "./vendor/*")
 LDFLAGS := -X 'main.version=$(VERSION)' -X 'main.revision=$(REVISION)'
 
 .PHONY: all
@@ -45,7 +47,7 @@ lint:
 .PHONY: run
 ## run
 run:
-	go run $(GOFILES)
+	go run $(CMDSRCS)
 
 .PHONY: build
 ## build
@@ -57,7 +59,8 @@ bin/$(NAME): $(SOURCES)
 		-tags netgo \
 		-installsuffix netgo \
 		-ldflags "$(LDFLAGS)" \
-		-o $@
+		-o $@ \
+		${PKG}/cmd/${NAME}
 
 .PHONY: install
 ## install
